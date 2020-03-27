@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bingo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="card" id="nuevo_usuario">
+        <div class="card-header">
+            <img src="./img/bingo.png" class="card-img-top" height="300" alt="...">
+           <h1> Bienvenid@ al bingo </h1>
+            <div class="alert alert-danger" role="alert" style="display: none" id="esperar">
+                <h1> Partida iniciada, espere a que termine..... </h1>
+            </div>
+        </div>
+        <div class="card-body">
+            <form onsubmit="return addUser(this)">
+                <h5 class="card-title">Introduce tu nombre</h5>
+                <div class="form-group">
+                    <label>Tu nombre</label>
+                    <input type="text" class="form-control" id="nombre">
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="bingo" style="display: none">
+        <nav class="navbar navbar-light bg-light">
+            <p class="navbar-brand" id="usuario"></p>
+            <p class="navbar-brand" id="linea_winner"></p>
+            <p class="navbar-brand" id="bingo_winner"></p>
+            <button class="btn btn-sm btn-outline-success"
+                    id="btn_iniciar"
+                    onclick="return iniciar(this)">
+                Iniciar
+            </button>
+            <button class="btn btn-sm btn-outline-success"
+                    id="btn_pausa"
+                    onclick="return pausa(this)"
+                    style="display: none">
+                Pausa
+            </button>
+            <button class="btn btn-sm btn-outline-success"
+                    id="btn_seguir"
+                    onclick="return seguir(this)"
+                    style="display: none">
+                Seguir
+            </button>
+            <button class="btn btn-sm btn-outline-info"
+                    id="btn_linea"
+                    style="display: none"
+                    onclick="return linea(this)">
+                Linea
+            </button>
+            <button class="btn btn-sm btn-outline-success"
+                    id="btn_bingo"
+                    style="display: none"
+                    onclick="return bingo(this)">
+                Bingo
+            </button>
+            <button class="btn btn-sm btn-outline-danger"
+                    id="btn_fin"
+                    style="display: none"
+                    onclick="return fin(this)">
+                Fin
+            </button>
+        </nav>
+        <div class="text-center" style="display: none" id="label_bola">
+                <p  id="numero"></p>
+        </div>
+        <table class="table">
+            <tbody>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola1">1</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola2">2</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola3">3</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola4">4</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola5">5</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola6">6</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola7">7</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola8">8</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola9">9</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola10">10</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola11">11</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola12">12</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola13">13</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola14">14</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola15">15</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola16">16</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola17">17</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola18">18</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola19">19</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola20">20</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola21">21</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola22">22</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola23">23</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola24">24</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola25">25</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola26">26</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola27">27</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola28">28</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola29">29</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola30">30</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola31">31</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola32">32</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola33">33</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola34">34</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola35">35</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola36">36</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola37">37</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola38">38</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola39">39</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola40">40</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola41">41</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola42">42</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola43">43</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola44">44</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola45">45</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola46">46</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola47">47</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola48">48</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola49">49</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola50">50</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola51">51</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola52">52</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola53">53</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola54">54</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola55">55</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola56">56</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola57">57</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola58">58</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola59">59</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola60">60</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola61">61</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola62">62</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola63">63</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola64">64</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola65">65</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola66">66</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola67">67</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola68">68</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola69">69</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola70">70</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola71">71</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola72">72</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola73">73</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola74">74</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola75">75</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola76">76</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola77">77</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola78">78</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola79">79</span>
+                </td>
+                <td>
+                    <span class=" text-white bg-dark p-2 font-weight-bold" id="bola80">80</span>
+                </td>
+            </tr>
+        </table>
+        <div class="alert alert-primary" role="alert">
+            <h4>Jugadores conectados</h4>
+            <div id="usuarios" class="alert alert-info" role="alert"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
