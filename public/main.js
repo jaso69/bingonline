@@ -1,4 +1,4 @@
-var socket = io.connect('http://klavel.es:80', {'forceNew': true});
+var socket = io.connect('http://ec2-18-221-32-176.us-east-2.compute.amazonaws.com/', {'forceNew': true});
 
 var user = null;
 var synth = window.speechSynthesis;
